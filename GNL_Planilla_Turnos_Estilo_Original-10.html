@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GNL - Planilla de Turnos</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef6ef;font-family:Arial,Helvetica,sans-serif;color:#17271d}
+.page{max-width:1200px;margin:22px auto;background:#fff;box-shadow:0 4px 22px #0002}
+.header{height:125px;display:flex;align-items:center;padding:15px 35px;gap:25px}
+.logo{width:145px;height:78px;border-radius:50%;background:#24a842;color:#fff;display:flex;align-items:center;justify-content:center;font-size:54px;font-weight:bold;font-style:italic;letter-spacing:-6px}
+.vline{height:85px;width:2px;background:#4b9f61}
+.brand h1{margin:0;color:#239a40;font-size:31px;letter-spacing:1px}
+.brand p{margin:5px 0 0;color:#23883b;font-size:14px;letter-spacing:2px}
+.toolbar{background:#087b3f;color:#fff;padding:14px 30px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.toolbar h2{margin:0;font-size:24px}.toolbar span{font-size:14px;opacity:.9}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,button,select{font:inherit}
+.date{border:0;border-radius:8px;padding:9px 10px;color:#173528}
+.btn{border:0;border-radius:8px;padding:9px 13px;font-weight:bold;cursor:pointer}
+.btn.white{background:#fff;color:#087b3f}.btn.green{background:#20a64a;color:#fff}.btn.red{background:#ffe9e7;color:#a5251b}
+.auto-box,.people-box{margin:16px 18px 0;background:#f0f8f1;border:1px solid #b9d9c1;border-radius:12px;padding:14px}
+.auto-title,.people-title{font-size:16px;font-weight:bold;color:#087b3f;margin-bottom:11px}
+.auto-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr auto;gap:9px;align-items:end}
+.auto-grid label{display:block;color:#4c6957;font-size:12px;font-weight:bold;margin:0 0 5px}
+.auto-grid input,.auto-grid select{width:100%;border:1px solid #bcd6c3;border-radius:8px;padding:9px;background:#fff}
+.auto-help,.people-help{font-size:12px;color:#5f7968;margin-top:9px}
+.people-actions{display:flex;gap:8px;flex-wrap:wrap}
+.people-actions textarea{width:100%;min-height:90px;border:1px solid #bcd6c3;border-radius:8px;padding:10px;resize:vertical}
+.people-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.person-chip{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #c8dfce;border-radius:18px;padding:6px 10px;font-size:13px}
+.person-chip button{border:0;background:transparent;color:#b3261e;cursor:pointer;font-weight:bold;padding:0}
+.table-wrap{padding:0 18px 18px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:800px}
+th{background:#24ad47;color:white;font-size:17px;padding:12px 10px;border-right:2px solid #168d3a}
+th:first-child{width:7%}th:nth-child(2),th:nth-child(3){width:34%}th:nth-child(4),th:nth-child(5){width:12.5%}
+td{border:1px solid #78ad83;height:55px;padding:4px;background:#f7fbf7}
+tr:nth-child(even) td{background:#eaf5eb}
+td.num{background:#0b8b40!important;color:#fff;text-align:center;font-size:20px;font-weight:bold;padding:0}
+.name-select,.time{width:100%;height:42px;border:1px solid #c5d9ca;border-radius:7px;background:#fff;padding:7px;font-size:15px;color:#152a1c}
+.time{text-align:center}
+.footer-row{display:grid;grid-template-columns:50% 25% 25%;background:#20ad47;color:#fff;min-height:66px;align-items:center}
+.footer-row>div{min-height:66px;display:flex;align-items:center;padding:12px 20px;border-right:1px solid #72c989}
+.footer-title{font-size:21px;font-weight:bold;flex:0 0 32%}
+.estibas-list{background:#eef8ef;color:#173528;flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.estiba-item{display:flex;align-items:center;gap:5px;background:white;border:1px solid #c8dfce;border-radius:8px;padding:4px 7px}
+.estiba-input{border:1px solid #c8dfce;background:#fff;outline:none;padding:7px;width:190px;font-weight:bold;color:#173528;border-radius:7px}
+.estiba-item{display:flex;flex-direction:column;align-items:stretch;gap:6px;background:white;border:1px solid #c8dfce;border-radius:8px;padding:7px}
+.estiba-item .estiba-nombre1,.estiba-item .estiba-nombre2{width:190px}
+.estiba-item>span{display:none}
+.estiba-del{align-self:flex-end}
+.estiba-del{border:0;background:#ffe9e7;color:#a5251b;border-radius:6px;cursor:pointer;padding:4px 6px}
+.estibas-add{background:#eef8ef;min-width:125px}
+.bottom{text-align:center;padding:25px 20px 28px}
+.bottom h3{margin:0;color:#15933d;font-size:29px;font-style:italic}
+.bottom p{margin:7px 0;color:#3e7350;font-size:15px}
+.values{display:flex;justify-content:center;gap:55px;margin-top:18px;color:#178e3b;font-weight:bold}
+.modal-back{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:center;justify-content:center;padding:18px}
+.modal-back.open{display:flex}
+.modal{width:min(650px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:18px;box-shadow:0 12px 40px #0005}
+.modal h3{margin:0 0 8px;color:#087b3f}
+.modal .close{float:right;border:0;background:#eee;border-radius:8px;padding:7px 10px;cursor:pointer}
+@media(max-width:800px){
+.page{margin:0;box-shadow:none}.header{height:100px;padding:12px 16px;gap:12px}.logo{width:95px;height:55px;font-size:38px}.vline{height:60px}.brand h1{font-size:20px}.brand p{font-size:10px}
+.auto-grid{grid-template-columns:1fr 1fr}.auto-grid>div:last-child{grid-column:1/-1}.auto-btn{width:100%}
+.toolbar{padding:12px 15px;flex-wrap:wrap}.toolbar h2{font-size:19px}
+.values{gap:15px;flex-wrap:wrap}.footer-row{min-width:720px}.footer-wrap{overflow-x:auto}
+}
+@media print{
+body{background:#fff}.page{margin:0;box-shadow:none}.toolbar .controls,.auto-box,.people-box,.modal-back{display:none!important}
+.name-select,.time{border:0;background:transparent}.bottom{padding-bottom:10px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo">gnl</div><div class="vline"></div>
+    <div class="brand"><h1>GREEN NETWORK<br>LOGISTICS</h1><p>PLANILLA DE TURNOS · EQUIPO OPERATIVO</p></div>
+  </div>
+
+  <div class="toolbar">
+    <div><h2>HORARIO DE TRABAJO</h2><span>Organización diaria del personal</span></div>
+    <div class="controls">
+      <input class="date" id="fecha" type="date">
+      <button class="btn white" onclick="abrirPersonal()">👥 Personal</button>
+      <button class="btn green" onclick="guardar()">Guardar</button>
+      <button class="btn white" onclick="window.print()">🖨</button>
+    </div>
+  </div>
+
+  <div class="people-box" id="peopleBox">
+    <div class="people-title">👥 PERSONAL REGISTRADO</div>
+    <div class="people-help">Agregue un nombre por línea. Quedarán guardados en el navegador para seleccionarlos después sin volver a escribirlos.</div>
+    <div class="people-actions">
+      <textarea id="nombresEntrada" placeholder="Ejemplo:
+Juan Pérez
+Samy Juliana
+Carlos Gómez
+María López"></textarea>
+      <button class="btn green" onclick="guardarListaPersonal()">💾 Guardar nombres</button>
+      <button class="btn white" onclick="cerrarPersonal()">Cerrar</button>
+    </div>
+    <div class="people-list" id="peopleList"></div>
+  </div>
+
+  <div class="auto-box">
+    <div class="auto-title">⚙️ GENERAR TURNOS AUTOMÁTICAMENTE</div>
+    <div class="auto-grid">
+      <div><label>Hora de inicio</label><input id="autoInicio" type="time" value="14:00"></div>
+      <div><label>Cantidad de personas</label><input id="autoCantidad" type="number" min="1" max="100" value="8"></div>
+      <div><label>Forma</label><select id="autoModo"><option value="grupo">Parejas de 2</option><option value="individual">Individual</option></select></div>
+      <div><label>Personas por grupo</label><input id="autoGrupo" type="number" min="1" value="2"></div>
+      <div><button class="btn green auto-btn" onclick="generarAutomatico()">⚡ Generar 8 horas</button></div>
+    </div>
+    <div class="auto-help">En parejas, las 8 horas totales se reparten entre las parejas. Ejemplo: 8 personas = 4 parejas = 2 horas por pareja.</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>N.º</th><th>Persona 1</th><th>Persona 2 / compañero</th><th>Hora de inicio</th><th>Hora de fin</th></tr></thead>
+      <tbody id="tabla"></tbody>
+    </table>
+  </div>
+
+  <div class="footer-wrap">
+    <div class="footer-row">
+      <div class="footer-title">📦 &nbsp; ESTIBAS 8 HORAS</div>
+      <div class="estibas-list" id="estibas"></div>
+      <div class="estibas-add"><button class="btn green" onclick="agregarEstiba()">＋ Agregar</button></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <h3>¡Juntos logramos más!</h3><p>El trabajo en equipo no solo hace que las cosas pasen, las hace mejor.</p>
+    <div class="values"><span>🛡 Seguridad</span><span>👥 Trabajo en equipo</span><span>📈 Eficiencia</span><span>🌿 Sostenibilidad</span></div>
+  </div>
+</div>
+
+<script>
+const KEY='gnl_planilla_visual_v3';
+const PEOPLE_KEY='gnl_personal_registrado_v2';
+let db=JSON.parse(localStorage.getItem(KEY)||'{}');
+const fecha=document.getElementById('fecha');
+fecha.value=new Date().toISOString().slice(0,10);
+
+function people(){try{return JSON.parse(localStorage.getItem(PEOPLE_KEY)||'[]')}catch(e){return[]}}
+function savePeople(a){localStorage.setItem(PEOPLE_KEY,JSON.stringify(a))}
+function abrirPersonal(){document.getElementById('peopleBox').style.display='block';document.getElementById('nombresEntrada').focus();renderPeople()}
+function cerrarPersonal(){document.getElementById('peopleBox').style.display='none'}
+function guardarListaPersonal(){
+  const nuevos=document.getElementById('nombresEntrada').value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+  let lista=people();
+  nuevos.forEach(n=>{if(!lista.some(x=>x.toLowerCase()===n.toLowerCase()))lista.push(n)});
+  savePeople(lista);document.getElementById('nombresEntrada').value='';renderPeople();cargar();
+}
+function borrarPersona(n){savePeople(people().filter(x=>x!==n));renderPeople();cargar()}
+function renderPeople(){
+  const box=document.getElementById('peopleList'), lista=people();
+  box.innerHTML=lista.length?lista.map(n=>`<span class="person-chip">${esc(n)} <button onclick="borrarPersona(${JSON.stringify(n)})" title="Eliminar">×</button></span>`).join(''):'<span style="color:#66756c;font-size:13px">No hay personal registrado todavía.</span>';
+}
+function options(selected=''){
+  return '<option value="">Seleccionar…</option>'+people().map(n=>`<option value="${escAttr(n)}" ${n===selected?'selected':''}>${esc(n)}</option>`).join('');
+}
+function filas(){
+  return [...document.querySelectorAll('#tabla tr')].map(r=>({
+    nombre1:r.querySelector('.nombre1').value,nombre2:r.querySelector('.nombre2').value,
+    inicio:r.querySelector('.inicio').value,fin:r.querySelector('.fin').value
+  }));
+}
+function guardar(){
+  db[fecha.value]={personal:filas(),estibas:[...document.querySelectorAll('#estibas .estiba-item')].map(x=>({nombre1:x.querySelector('.estiba-nombre1')?.value||'',nombre2:x.querySelector('.estiba-nombre2')?.value||''})).filter(x=>x.nombre1||x.nombre2)};
+  localStorage.setItem(KEY,JSON.stringify(db));alert('Horario guardado correctamente.');
+}
+function horaAMinutos(h){let [a,b]=h.split(':').map(Number);return a*60+b}
+function minutosAHora(t){t=Math.round(t);t=((t%1440)+1440)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
+function sumarMin(h,m){return minutosAHora(horaAMinutos(h)+m)}
+function generarAutomatico(){
+  const inicio=document.getElementById('autoInicio').value;
+  const cantidad=Math.max(1,Math.min(100,parseInt(document.getElementById('autoCantidad').value)||1));
+  const modo=document.getElementById('autoModo').value;
+  const porGrupo=Math.max(1,parseInt(document.getElementById('autoGrupo').value)||2);
+  if(!inicio){alert('Seleccione la hora de inicio.');return}
+  let lista=people();
+  if(lista.length<cantidad){alert('Tiene '+lista.length+' personas registradas y está intentando usar '+cantidad+'. Agregue primero todo el personal en el botón “👥 Personal”.');return}
+  let filasOut=[];
+  if(modo==='individual'){
+    const fin=sumarMin(inicio,480);
+    for(let i=0;i<cantidad;i++)filasOut.push({nombre1:lista[i],nombre2:'',inicio,fin});
+  }else{
+    const grupos=Math.ceil(cantidad/porGrupo), minutos=480/grupos;
+    for(let g=0;g<grupos;g++){
+      const desde=g*porGrupo,hasta=Math.min(desde+porGrupo,cantidad);
+      const nombres=lista.slice(desde,hasta);
+      const ini=sumarMin(inicio,g*minutos);
+      const fin=sumarMin(inicio,(g+1)*minutos);
+      filasOut.push({nombre1:nombres[0]||'',nombre2:nombres[1]||'',inicio:ini,fin});
+    }
+  }
+  db[fecha.value]={personal:filasOut,estibas:db[fecha.value]?.estibas||[]};
+  localStorage.setItem(KEY,JSON.stringify(db));cargar();
+}
+function cargar(){
+  const saved=db[fecha.value]||{};
+  let arr=Array.isArray(saved)?saved:(saved.personal||[]);
+  arr=arr.map(x=>({nombre1:x.nombre1||x.nombre||'',nombre2:x.nombre2||'',inicio:x.inicio||'',fin:x.fin||''}));
+  while(arr.length<10)arr.push({nombre1:'',nombre2:'',inicio:'',fin:''});
+  document.getElementById('tabla').innerHTML=arr.slice(0,10).map((x,i)=>`
+    <tr><td class="num">${i+1}</td>
+    <td><select class="name-select nombre1">${options(x.nombre1)}</select></td>
+    <td><select class="name-select nombre2">${options(x.nombre2)}</select></td>
+    <td><input class="time inicio" type="time" value="${escAttr(x.inicio)}"></td>
+    <td><input class="time fin" type="time" value="${escAttr(x.fin)}"></td></tr>`).join('');
+  const est=Array.isArray(saved)?[]:(saved.estibas||[]);
+  document.getElementById('estibas').innerHTML='';est.forEach(n=>{ if(typeof n==='string') agregarEstiba(n,''); else agregarEstiba(n.nombre1||'',n.nombre2||''); });
+}
+function estibaOptions(selected=''){
+  return '<option value="">Seleccionar…</option>'+people().map(n=>`<option value="${escAttr(n)}" ${n===selected?'selected':''}>${esc(n)}</option>`).join('');
+}
+function agregarEstiba(nombre='',nombre2=''){
+  const box=document.getElementById('estibas'),item=document.createElement('div');item.className='estiba-item';
+  item.innerHTML=`<select class="estiba-input estiba-nombre1">${estibaOptions(nombre)}</select>
+    <span style="font-weight:bold;color:#198754">+</span>
+    <select class="estiba-input estiba-nombre2">${estibaOptions(nombre2)}</select>
+    <button class="estiba-del" onclick="this.parentElement.remove()">✕</button>`;
+  box.appendChild(item);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escAttr(s){return esc(s).replace(/'/g,'&#039;')}
+fecha.addEventListener('change',cargar);
+document.getElementById('peopleBox').style.display='none';
+renderPeople();cargar();
+</script>
+</body>
+</html>
